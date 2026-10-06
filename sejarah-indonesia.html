@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Kuis Sejarah Indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex items-center justify-center p-4 min-h-screen">
+
+    <!-- Container Utama -->
+    <div class="w-full max-w-3xl glass-card rounded-2xl shadow-2xl overflow-hidden border border-white/20 transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-800 text-white p-6 text-center relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
+                <i class="fas fa-flag"></i> Kuis Sejarah Indonesia
+            </h1>
+            <p class="text-red-100 text-sm mt-1">Uji Pengetahuan Sejarah Nusantara Anda</p>
+        </div>
+
+        <!-- Layar Mulai -->
+        <div id="start-screen" class="p-8 text-center space-y-6">
+            <div class="w-24 h-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-xl font-bold text-slate-800">Siap untuk Menjelajahi Sejarah?</h2>
+                <p class="text-slate-600 text-sm max-w-md mx-auto">
+                    Kuis ini terdiri dari <span class="font-bold text-red-600">50 soal pilihan ganda</span> yang mencakup era Kerajaan Nusantara, Kolonialisme, Pergerakan Nasional, Kemerdekaan, hingga Era Modern.
+                </p>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-left text-xs sm:text-sm space-y-2 max-w-md mx-auto">
+                <div class="flex items-center gap-2 text-slate-700">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    <span>Setiap soal memiliki nilai 2 poin (Maksimal 100)</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-700">
+                    <i class="fas fa-clock text-amber-500"></i>
+                    <span>Waktu: 30 Detik per soal</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-700">
+                    <i class="fas fa-lightbulb text-blue-500"></i>
+                    <span>Dilengkapi dengan pembahasan lengkap</span>
+                </div>
+            </div>
+            <button id="start-btn" class="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-red-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                Mulai Kuis Sekarang
+            </button>
+        </div>
+
+        <!-- Layar Game -->
+        <div id="game-screen" class="p-6 hidden">
+            <!-- Progress & Info -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Soal</span>
+                    <span id="question-number" class="text-lg font-bold text-red-600">1/50</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-sm font-medium border border-amber-200">
+                        <i class="fas fa-clock"></i>
+                        <span id="timer">30</span>s
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium border border-blue-200">
+                        <i class="fas fa-star"></i>
+                        <span id="score">0</span> Poin
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 rounded-full h-2 my-4 overflow-hidden">
+                <div id="progress-bar" class="bg-red-600 h-2 rounded-full transition-all duration-300" style="width: 2%"></div>
+            </div>
+
+            <!-- Pertanyaan -->
+            <div class="my-6">
+                <h3 id="question-text" class="text-lg sm:text-xl font-semibold text-slate-800 leading-relaxed">
+                    Memuat pertanyaan...
+                </h3>
+            </div>
+
+            <!-- Pilihan Jawaban -->
+            <div id="options-container" class="space-y-3">
+                <!-- Pilihan akan dimasukkan melalui JavaScript -->
+            </div>
+
+            <!-- Kotak Penjelasan/Pembahasan -->
+            <div id="explanation-box" class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 hidden">
+                <h4 class="font-semibold text-sm text-slate-700 flex items-center gap-2 mb-1">
+                    <i class="fas fa-info-circle text-blue-500"></i> Pembahasan:
+                </h4>
+                <p id="explanation-text" class="text-sm text-slate-600 leading-relaxed"></p>
+            </div>
+
+            <!-- Tombol Lanjut -->
+            <div class="mt-6 flex justify-end">
+                <button id="next-btn" class="hidden px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-xl shadow-md transition-all flex items-center gap-2">
+                    <span>Soal Berikutnya</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Layar Hasil -->
+        <div id="result-screen" class="p-8 text-center space-y-6 hidden">
+            <div class="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Kuis Selesai!</h2>
+                <p class="text-slate-500 text-sm mt-1">Berikut adalah ringkasan hasil Anda</p>
+            </div>
+
+            <!-- Kartu Nilai Akhir -->
+            <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-2xl border border-slate-200 max-w-md mx-auto grid grid-cols-2 gap-4">
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="text-xs text-slate-400 block font-medium">Skor Akhir</span>
+                    <span id="final-score" class="text-3xl font-extrabold text-red-600">0</span>
+                    <span class="text-xs text-slate-400 font-medium">/ 100</span>
+                </div>
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="text-xs text-slate-400 block font-medium">Akurasi Jawaban</span>
+                    <span id="accuracy-text" class="text-3xl font-extrabold text-slate-800">0%</span>
+                </div>
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="text-xs text-slate-400 block font-medium">Benar</span>
+                    <span id="correct-count" class="text-xl font-bold text-green-600">0</span>
+                </div>
+                <div class="p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="text-xs text-slate-400 block font-medium">Salah / Waktu Habis</span>
+                    <span id="wrong-count" class="text-xl font-bold text-red-500">0</span>
+                </div>
+            </div>
+
+            <p id="feedback-text" class="text-sm font-medium text-slate-600 max-w-md mx-auto">
+                -
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button id="restart-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-redo"></i> Main Lagi
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logika Game & Data Soal -->
+    <script>
+        // Data 50 Soal Sejarah Indonesia
+        const questions = [
+            {
+                q: "Kerajaan Hindu tertua di Indonesia yang dibuktikan dengan penemuan Prasasti Yupa adalah...",
+                options: ["Kerajaan Tarumanagara", "Kerajaan Kutai", "Kerajaan Majapahit", "Kerajaan Singasari"],
+                answer: 1,
+                explanation: "Kerajaan Kutai di Kalimantan Timur merupakan kerajaan Hindu tertua di Indonesia yang berdiri sekitar abad ke-4 Masehi, dibuktikan dengan keberadaan 7 Prasasti Yupa."
+            },
+            {
+                q: "Raja terkenal dari Kerajaan Tarumanagara yang membangun saluran air Gomati sepanjang 6.122 tombak adalah...",
+                options: ["Mulawarman", "Purnawarman", "Sanjaya", "Aswawarman"],
+                answer: 1,
+                explanation: "Raja Purnawarman adalah raja terkemuka Tarumanagara yang terkenal dengan proyek penggalian Sungai Gomati untuk irigasi dan pencegahan banjir."
+            },
+            {
+                q: "Candi Borobudur dibangun pada masa pemerintahan dinasti/wangsa...",
+                options: ["Sanjaya", "Syailendra", "Isyana", "Girindra"],
+                answer: 1,
+                explanation: "Candi Borobudur dibangun oleh penganut agama Buddha Mahayana dari Wangsa Syailendra sekitar abad ke-8 hingga ke-9 Masehi."
+            },
+            {
+                q: "Cita-cita Mahapatih Gajah Mada untuk menyatukan Nusantara dituangkan dalam ikrar bernama...",
+                options: ["Sumpah Pemuda", "Sumpah Palapa", "Prasasti Ciaruteun", "Kitab Negarakertagama"],
+                answer: 1,
+                explanation: "Sumpah Palapa diucapkan oleh Gajah Mada saat diangkat menjadi Mahapatih Majapahit, berisi janji tidak akan menikmati kenikmatan duniawi sebelum menyatukan Nusantara."
+            },
+            {
+                q: "Kerajaan Islam pertama di Indonesia yang terletak di bagian utara Pulau Sumatra adalah...",
+                options: ["Kesultanan Malaka", "Kesultanan Samudera Pasai", "Kesultanan Aceh", "Kesultanan Demak"],
+                answer: 1,
+                explanation: "Samudera Pasai yang terletak di Lhokseumawe, Aceh, diakui sebagai kerajaan Islam pertama di Nusantara yang berdiri sejak abad ke-13 Masehi."
+            },
+            {
+                q: "Sultan dari Kesultanan Gowa-Tallo yang dijuluki 'Ayam Jantan dari Timur' oleh Belanda adalah...",
+                options: ["Sultan Ageng Tirtayasa", "Sultan Hasanuddin", "Sultan Baabullah", "Sultan Agung"],
+                answer: 1,
+                explanation: "Sultan Hasanuddin diberi julukan De Haantjes van de Oosten (Ayam Jantan dari Timur) oleh Belanda karena keberaniannya melawan VOC."
+            },
+            {
+                q: "Bangsa Eropa pertama yang berhasil mendarat dan menguasai perdagangan di Malaka pada tahun 1511 adalah...",
+                options: ["Spanyol", "Inggris", "Belanda", "Portugis"],
+                answer: 3,
+                explanation: "Ekspedisi Portugis di bawah pimpinan Afonso de Albuquerque berhasil menaklukkan Malaka pada tahun 1511."
+            },
+            {
+                q: "Gubernur Jenderal VOC pertama yang memindahkan pusat pemerintahan VOC dari Ambon ke Batavia adalah...",
+                options: ["Jan Pieterszoon Coen", "Herman Willem Daendels", "Cornelis de Houtman", "Van den Bosch"],
+                answer: 0,
+                explanation: "Jan Pieterszoon Coen menduduki Jayakarta pada 1619, mengubah namanya menjadi Batavia, dan menjadikannya pusat kekuasaan VOC."
+            },
+            {
+                q: "Sistem Tanam Paksa (Cultuurstelsel) di Indonesia diperkenalkan oleh Gubernur Jenderal...",
+                options: ["Raffles", "Daendels", "Johannes van den Bosch", "Van Deventer"],
+                answer: 2,
+                explanation: "Johannes van den Bosch memperkenalkan Cultuurstelsel pada tahun 1830 untuk mengisi kembali kas Belanda yang kosong akibat perang."
+            },
+            {
+                q: "Buku berjudul 'Max Havelaar' yang mengkritik kekejaman Tanam Paksa di Jawa ditulis oleh Multatuli, nama asli dari...",
+                options: ["Suwardi Suryaningrat", "Eduard Douwes Dekker", "Danudirja Setiabudi", "Cipto Mangunkusumo"],
+                answer: 1,
+                explanation: "Multatuli adalah nama pena dari Eduard Douwes Dekker, seorang mantan pejabat pemerintah kolonial Belanda yang menentang sistem Tanam Paksa."
+            },
+            {
+                q: "Perang Diponegoro (Perang Jawa) berlangsung dari tahun...",
+                options: ["1821 - 1825", "1825 - 1830", "1830 - 1835", "1808 - 1811"],
+                answer: 1,
+                explanation: "Perang Diponegoro pecah pada tahun 1825 akibat pemasangan patok jalan yang melintasi makam leluhur Pangeran Diponegoro dan berakhir pada tahun 1830."
+            },
+            {
+                q: "Organisasi pergerakan nasional pertama di Indonesia yang didirikan pada 20 Mei 1908 adalah...",
+                options: ["Sikat Islam", "Indische Partij", "Budi Utomo", "Perhimpunan Indonesia"],
+                answer: 2,
+                explanation: "Budi Utomo didirikan oleh Dr. Soetomo dan para mahasiswa STOVIA pada 20 Mei 1908, yang kini diperingati sebagai Hari Kebangkitan Nasional."
+            },
+            {
+                q: "Tiga Serangkai pendiri Indische Partij (1912) terdiri dari...",
+                options: ["Soekarno, Hatta, Sjahrir", "Douwes Dekker, Cipto Mangunkusumo, Ki Hajar Dewantara", "Ahmad Dahlan, HOS Cokroaminoto, Agus Salim", "Tan Malaka, Musso, Alimin"],
+                answer: 1,
+                explanation: "Indische Partij didirikan oleh E.F.E. Douwes Dekker (Danudirja Setiabudi), Dr. Cipto Mangunkusumo, dan Suwardi Suryaningrat (Ki Hajar Dewantara)."
+            },
+            {
+                q: "Ikrar Sumpah Pemuda dicetuskan pada tanggal...",
+                options: ["17 Agustus 1945", "28 Oktober 1928", "20 Mei 1908", "10 November 1945"],
+                answer: 1,
+                explanation: "Sumpah Pemuda dirumuskan dalam Kongres Pemuda II di Jakarta pada tanggal 28 Oktober 1928."
+            },
+            {
+                q: "Lagu kebangsaan 'Indonesia Raya' pertama kali diperdengarkan secara umum pada saat...",
+                options: ["Proklamasi Kemerdekaan", "Kongres Pemuda II", "Sidang BPUPKI", "Peristiwa Rengasdengklok"],
+                answer: 1,
+                explanation: "Lagu Indonesia Raya ciptaan W.R. Supratman pertama kali dimainkan menggunakan biola tanpa vokal pada Kongres Pemuda II tanggal 28 Oktober 1928."
+            },
+            {
+                q: "Jepang pertama kali mendarat di Indonesia pada awal tahun 1942 di kota...",
+                options: ["Batavia", "Tarakan", "Surabaya", "Palembang"],
+                answer: 1,
+                explanation: "Pasukan Jepang pertama kali menguasai wilayah Indonesia dengan mendarat di Tarakan, Kalimantan Timur pada 11 Januari 1942 karena kekayaan minyak buminya."
+            },
+            {
+                q: "Badan penjelidik yang dibentuk Jepang untuk mempersiapkan kemerdekaan Indonesia adalah...",
+                options: ["PPKI", "BPUPKI", "KNIP", "PETA"],
+                answer: 1,
+                explanation: "Dokuritsu Junbi Cosakai atau BPUPKI (Badan Penyelidik Usaha-Usaha Persiapan Kemerdekaan Indonesia) dibentuk pada 1 Maret 1945."
+            },
+            {
+                q: "Ketua BPUPKI yang memimpin sidang-sidang persiapan kemerdekaan adalah...",
+                options: ["Ir. Soekarno", "Drs. Mohammad Hatta", "Dr. K.R.T. Radjiman Wedyodiningrat", "Mr. Soepomo"],
+                answer: 2,
+                explanation: "Dr. Radjiman Wedyodiningrat ditunjuk sebagai ketua BPUPKI selama masa persidangannya."
+            },
+            {
+                q: "Pancasila pertama kali diusulkan oleh Ir. Soekarno sebagai dasar negara pada tanggal...",
+                options: ["29 Mei 1945", "1 Juni 1945", "22 Juni 1945", "18 Agustus 1945"],
+                answer: 1,
+                explanation: "Gagasan dasar negara yang dinamakan 'Pancasila' disampaikan oleh Ir. Soekarno dalam pidatonya pada sidang BPUPKI tanggal 1 Juni 1945."
+            },
+            {
+                q: "Peristiwa penculikan Soekarno dan Hatta oleh para pemuda ke luar kota sebelum Proklamasi dinamakan...",
+                options: ["Peristiwa Bandung Lautan Api", "Peristiwa Rengasdengklok", "Insiden Hotel Yamato", "Peristiwa Lima Hari"],
+                answer: 1,
+                explanation: "Peristiwa Rengasdengklok terjadi pada 16 Agustus 1945 di mana golongan muda membawa Soekarno-Hatta agar terbebas dari pengaruh Jepang."
+            },
+            {
+                q: "Tokoh yang mengetik teks Proklamasi Kemerdekaan Indonesia adalah...",
+                options: ["Sayuti Melik", "Sukarni", "B.M. Diah", "Chaerul Saleh"],
+                answer: 0,
+                explanation: "Sayuti Melik mengetik naskah proklamasi berdasarkan konsep tulisan tangan Ir. Soekarno dengan beberapa perubahan ejaan."
+            },
+            {
+                q: "Bendera Pusaka Sang Saka Merah Putih dijahit langsung oleh...",
+                options: ["Sayuti Melik", "Fatmawati", "S.K. Trimurti", "Nai Sontang"],
+                answer: 1,
+                explanation: "Ibu Fatmawati, istri dari Ir. Soekarno, menjahit sendiri Bendera Pusaka Merah Putih yang dikibarkan saat Proklamasi 17 Agustus 1945."
+            },
+            {
+                q: "Naskah Proklamasi Kemerdekaan Indonesia dibacakan di jalan...",
+                options: ["Pegangsaan Timur No. 56", "Imam Bonjol No. 1", "Pahlawan No. 10", "Medan Merdeka Barat"],
+                answer: 0,
+                explanation: "Proklamasi dibacakan di halaman rumah Ir. Soekarno di Jalan Pegangsaan Timur No. 56, Jakarta Pusat."
+            },
+            {
+                q: "Negara pertama yang memberikan pengakuan de facto dan de jure atas kemerdekaan Indonesia adalah...",
+                options: ["India", "Mesir", "Australia", "Uni Soviet"],
+                answer: 1,
+                explanation: "Mesir secara resmi mengakui kemerdekaan Indonesia pada 10 Juni 1947 dan menggalang dukungan dari negara-negara Liga Arab."
+            },
+            {
+                q: "Pertempuran dahsyat di Surabaya pada 10 November 1945 dipicu oleh tewasnya perwira Inggris yaitu...",
+                options: ["Jendral Christison", "M.S. Mallaby", "Lord Mountbatten", "R.E. Capper"],
+                answer: 1,
+                explanation: "Tewasnya Brigadir Jenderal A.W.S. Mall
